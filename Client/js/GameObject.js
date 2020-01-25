@@ -98,7 +98,7 @@ class Scene {
 
     update() {
         this.elements.forEach(element => {
-            Agent a = (Agent) element;
+
         });
     }
 }
