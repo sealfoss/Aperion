@@ -1,32 +1,36 @@
 src="js/three.js"
 
 
-function Agent( name, model, collisionRadius ) {
-    this.name = name;
-    this.model = model;
-    this.collisionRadius = collisionRadius;
+class Agent {
+    constructor( name, model, collisionRadius, scene ) {
+        this.name = name;
+        this.model = model;
+        this.collisionRadius = collisionRadius;
+        this.collidingWith = {};
+        this.scene = scene;
+    }
 
-    this.getPosition = function() {
+    getPosition() {
         return model.position;
     }
 
-    this.getRotation = function() {
+    getRotation() {
         return model.rotation;
     }
 
-    this.setPosition = function( newPosition ) {
+    setPosition( newPosition ) {
         model.position = newPosition;
     }
 
-    this.setRotation = function( newRotation ) {
+    setRotation( newRotation ) {
         model.rotation = newRotation;
     }
 
-    this.onCollision = function( collision ) {
+    onCollision( collision ) {
 
     }
 
-    this.detectCollision = function(other) {
+    detectCollision(other) {
         var pos = this.getPosition();
         var otherPos = other.getPosition();
         var colDist = this.collisionRadius + other.collisionRadius;
@@ -41,19 +45,27 @@ function Agent( name, model, collisionRadius ) {
         return collision;
     }
 
-    this.update = function() {
-
+    update() {
+        if(collidingWith.length > 0) {
+            collidingWith.forEach(element => {
+                onCollision(element);
+            });
+        }
     }
 }
 
-function Boid( name, model, collisionRadius ) {
-    Agent.call( name, model, collisionRadius );
+class Boid extends Agent{
+    constructor( name, model, collisionRadius ) {
+        //Agent.call( name, model, collisionRadius );
+        super( name, model, collisionRadius );
+    }
 
-    this.simulate = function() {
+    simulate() {
 
     }
 
-    this.update = function() {
+    update() {
+        super.update();
         simulate();
     }
 }
@@ -98,7 +110,24 @@ class Scene {
 
     update() {
         this.elements.forEach(element => {
+            element.update();
+        });
+    }
 
+    exhaustiveCollision() {
+        this.elements.forEach(elementA => {
+            elementA.collidingWith = {};
+            var collision = false;
+
+            this.elements.forEach(elementB => {
+                
+                if(elementA != elementB
+                    && elementA.detectCollision(elementB)) {
+                        var len = elementA.collidingWith.length;
+                        elementA.collidingWith[len] = elementB;
+                        collision = true;
+                }
+            });
         });
     }
 }
